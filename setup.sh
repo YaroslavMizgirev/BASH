@@ -124,12 +124,12 @@ if [[ -f "$USER_SAVE_CONFIGURE" ]]; then
             sudo mkdir -p $SOFT_INPUT_PATH
             sudo mkdir -p $SOFT_OUTPUT_PATH
             echo "$(date +"%A %d %B %Y %T"): Разносим файлы по созданным папкам." >> $USER_SETUP_LOG_FILE
-            sudo mv -f ./bin/∗.run $SOFT_BIN_PATH
-            sudo mv -f ∗.sh $SOFT_BIN_PATH
-            sudo mv -f ./docs/∗.pdf $SOFT_DOCS_PATH
-            sudo mv -f ./docs/∗.txt $SOFT_DOCS_PATH
-            sudo mv -f ∗.log $SOFT_TEMP_PATH
-            sudo mv -f ∗.task $SOFT_INPUT_PATH
+            sudo mv -f ∗.run $SOFT_BIN_PATH/
+            sudo mv -f ∗.sh $SOFT_BIN_PATH/
+            sudo mv -f ∗.pdf $SOFT_DOCS_PATH/
+            sudo mv -f ∗.txt $SOFT_DOCS_PATH/
+            sudo mv -f ∗.log $SOFT_TEMP_PATH/
+            sudo mv -f ∗.task $SOFT_INPUT_PATH/
             echo "$(date +"%A %d %B %Y %T"): Создаем символические ссылки в /usr/bin/." >> $USER_SETUP_LOG_FILE
             sudo ln -s $SOFT_BIN_PATH/polynom_calc.run /usr/bin/polynom_calc.exe
             sudo ln -s $SOFT_BIN_PATH/remove.sh /usr/bin/uninstall_polynom_calc.exe
