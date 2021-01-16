@@ -1,11 +1,7 @@
 #!/bin/bash
 clear
-USER_REMOVE_LOG_FILE=$HOME/remove.log
-USER_SAVE_CONFIGURE=$HOME/install.conf
-error_count=0
-echo "Производится удаление программы"
 while true; do
-    read -p "Вы действительно хотите удалить программу. (Y/N): " answer_remove
+    read -p "Вы действительно хотите удалить программу 'Калькулятор полиномов'. (Y/N): " answer_remove
     if [[ "$answervar" =~ ^[yY]$ ]]; then
         break 
     elif [[ "$answervar" =~ ^[nN]$ ]]; then
@@ -14,6 +10,12 @@ while true; do
         echo "Неверный ввод. Повторите."
     fi
 done
+echo "Производится удаление программы"
+USER_SAVE_CONFIGURE=$(pwd)/install.conf
+
+USER_REMOVE_LOG_FILE=$HOME/remove.log
+error_count=0
+
 echo "$(date +"%A %d %B %Y %T"): Начинаем удаление программы." >> $USER_REMOVE_LOG_FILE
 echo "$(date +"%A %d %B %Y %T"): Проверяем наличие конфигурационного файла." >> $USER_REMOVE_LOG_FILE
 if [[ -f "$USER_SAVE_CONFIGURE" ]]; then

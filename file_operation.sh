@@ -37,27 +37,27 @@ function file_info() {
 # это файл? да-0/нет-1
 function isFile() {
     if [[ ! $# -eq 1 ]]; then
-        # printf "Параметр должен быть один: имя файла.\n"
+        printf "Параметр должен быть один: имя файла.\n"
         return 22
     fi
     if [[ -f "$1" ]]; then
-        # local access_file=''
-        # if [[ -r "$1" ]]; then
-        #     access_file+="r"
-        # fi
-        # if [[ -w "$1" ]]; then
-        #     access_file+="w"
-        # fi
-        # if [[ -x "$1" ]]; then
-        #     access_file+="x"
-        # fi
-        # printf "'%s' - это файл с правами доступа '%s'.\n" "$1" "$access_file"
+        local access_file=''
+        if [[ -r "$1" ]]; then
+            access_file+="r"
+        fi
+        if [[ -w "$1" ]]; then
+            access_file+="w"
+        fi
+        if [[ -x "$1" ]]; then
+            access_file+="x"
+        fi
+        printf "'%s' - это файл с правами доступа '%s'.\n" "$1" "$access_file"
         return 0
     elif [[ -e "$1" ]]; then
-        # printf "'%s' - это не файл.\n" "$1"
+        printf "'%s' - это не файл.\n" "$1"
         return 1
     else
-        # printf "'%s' - файла не существует.\n" "$1"
+        printf "'%s' - файла не существует.\n" "$1"
         return 1
     fi
 }
@@ -65,18 +65,18 @@ function isFile() {
 # этот файл доступен для записи? да-0/нет-1
 function isWritableFile() {
     if [[ ! $# -eq 1 ]]; then
-        # printf "Параметр должен быть один: имя файла.\n"
+        printf "Параметр должен быть один: имя файла.\n"
         return 22
     fi
     if [[ -f "$1" ]]; then
         if [[ -w "$1" ]]; then
-            # printf "'%s' - это файл доступный для записи.\n" "$1"
+            printf "'%s' - это файл доступный для записи.\n" "$1"
             return 0
         fi
-        # printf "'%s' - это файл не доступный для записи.\n" "$1"
+        printf "'%s' - это файл не доступный для записи.\n" "$1"
         return 1
     else
-        # printf "'%s' - это не файл.\n" "$1"
+        printf "'%s' - это не файл.\n" "$1"
         return 1
     fi
 }
@@ -84,14 +84,14 @@ function isWritableFile() {
 # это директория? да-0/нет-1
 function isFolder() {
     if [[ ! $# -eq 1 ]]; then
-        # printf "Параметр должен быть один: имя файла.\n"
+        printf "Параметр должен быть один: имя файла.\n"
         return 22
     fi
     if [[ -d "$1" ]]; then
-        # printf "'%s' - это директория.\n" "$1"
+        printf "'%s' - это директория.\n" "$1"
         return 0
     else
-        # printf "'%s' - это не директория.\n" "$1"
+        printf "'%s' - это не директория.\n" "$1"
         return 1
     fi
 }

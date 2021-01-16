@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=PROGRAM_NAME
+Exec=EXEC_FILE
+Encoding=UTF-8
+Terminal=true
+Type=Application
+Categories=Utility;
+Icon=ICON_FILE
