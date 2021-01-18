@@ -2,35 +2,28 @@
 source file_operation.sh
 
 function return_entered_username() {
-    if [[ "$#" -eq 2 ]]; then
-        local hasLogFile=1
-        isFile $2
-        if [[ "$?" -eq 0 ]]; then
-            isWritableFile $2
-            if [[ ! "$?" -eq 0 ]]; then
-                chmod u+w $2
-            fi
-        else
-            touch $2
-            isWritableFile $2
-            if [[ ! "$?" -eq 0 ]]; then
-                chmod u+w $2
-            fi
+    if [[ $# -eq 2 ]]; then
+        if [[ ! -f "$2" ]]; then
+            printf "Ошибка: Некорректный лог-файл.\n"
+            return 23
         fi
-        echo "У функции два параметра: 1 - возвращаемая переменная (обязательная); 2 - 'имя лог-файла' (по требованию)."
+        if [[ ! -w "$2" ]]; then
+            printf "Ошибка: Лог-файл не записываемый.\n"
+            return 24
+        fi
+        local hasLogFile=1
         local USER_LOG_FILE=$2
         local -n username_func=$1
-    elif [[ "$#" -eq 1 ]]; then
-        echo "У функции один параметр: 1 - возвращаемая переменная (обязательная). Т.к. второго пераметра нет - лог-файл не записывается."
-        local -n username_func=$1
-        local hasLogFile=0
-    else
-        echo "Ошибка: У функции нет параметров. Всего два параметра: 1 - возвращаемая переменная (обязательная); 2 - 'имя лог-файла' (по требованию)."
-        return 1
-    fi
-    # echo "local -n username_a = $username_a"
-    if [[ "$hasLogFile" -eq 1 ]]; then
         echo "$(date +"%A %d %B %Y %T"): Начинаем вводить имя пользователя." >> $USER_LOG_FILE
+    elif [[ $# -eq 1 ]]; then
+        local hasLogFile=0
+        local -n username_func=$1
+    else
+        printf "Ошибка: Некорректные параметры функции.\n"
+        printf "У функции может быть два параметра:\n"
+        printf "    1ый (обязательный) - 'имя переменной возвращаемого значения функции';\n"
+        printf "    2ой (не обязательный) - 'имя существующего лог-файла'.\n"
+        return 22
     fi
     local uservar=''
     while true; do
@@ -56,95 +49,81 @@ function return_entered_username() {
     if [[ "$hasLogFile" -eq 1 ]]; then
         echo "$(date +"%A %d %B %Y %T"): Закончили вводить имя пользователя." >> $USER_LOG_FILE
     fi
-    # echo ${username}
     return 0
 }
 
 function return_entered_email() {
-    if [[ "$#" -eq 2 ]]; then
-        local hasLogFile=1
-        isFile $2
-        if [[ "$?" -eq 0 ]]; then
-            isWritableFile $2
-            if [[ ! "$?" -eq 0 ]]; then
-                chmod u+w $2
-            fi
-        else
-            touch $2
-            isWritableFile $2
-            if [[ ! "$?" -eq 0 ]]; then
-                chmod u+w $2
-            fi
+    if [[ $# -eq 2 ]]; then
+        if [[ ! -f "$2" ]]; then
+            printf "Ошибка: Некорректный лог-файл.\n"
+            return 23
         fi
-        echo "У функции два параметра: 1 - возвращаемая переменная (обязательная); 2 - 'имя лог-файла' (по требованию)."
+        if [[ ! -w "$2" ]]; then
+            printf "Ошибка: Лог-файл не записываемый.\n"
+            return 24
+        fi
+        local hasLogFile=1
         local USER_LOG_FILE=$2
         local -n email_func=$1
-    elif [[ "$#" -eq 1 ]]; then
-        echo "У функции один параметр: 1 - возвращаемая переменная (обязательная). Т.к. второго пераметра нет - лог-файл не записывается."
-        local -n email_func=$1
-        local hasLogFile=0
-    else
-        echo "Ошибка: У функции нет параметров. Всего два параметра: 1 - возвращаемая переменная (обязательная); 2 - 'имя лог-файла' (по требованию)."
-        return 1
-    fi
-    if [[ "$hasLogFile" -eq 1 ]]; then
         echo "$(date +"%A %d %B %Y %T"): Начинаем вводить e-mail." >> $USER_LOG_FILE
+    elif [[ $# -eq 1 ]]; then
+        local hasLogFile=0
+        local -n email_func=$1
+    else
+        printf "Ошибка: Некорректные параметры функции.\n"
+        printf "У функции может быть два параметра:\n"
+        printf "    1ый (обязательный) - 'имя переменной возвращаемого значения функции';\n"
+        printf "    2ой (не обязательный) - 'имя существующего лог-файла'.\n"
+        return 22
     fi
     while true; do
         read -p "Введите E-mail: " email_func
         if [[ -z "$email_func" ]]; then
             echo "E-mail не должен быть пустым"
             if [[ "$hasLogFile" -eq 1 ]]; then
-                echo "$(date +"%A %d %B %Y %T"): Пользователь $USER ввел пустое значение E-mail." >> $USER_LOG_FILE
+                echo "$(date +"%A %d %B %Y %T"): Пользователь $USER ввел пустое значение e-mail." >> $USER_LOG_FILE
             fi
         elif [[ "$email_func" =~ ^[a-zA-Z0-9._-]*@[a-zA-Z0-9._-]*\.[a-zA-Z]{2,5}$ ]]; then
             if [[ "$hasLogFile" -eq 1 ]]; then
-                echo "$(date +"%A %d %B %Y %T"): Пользователь $USER ввел корректное значение E-mail '$email_func'." >> $USER_LOG_FILE
+                echo "$(date +"%A %d %B %Y %T"): Пользователь $USER ввел корректное значение e-mail '$email_func'." >> $USER_LOG_FILE
             fi
             break
         else 
             echo "Неверный формат E-mail."
             if [[ "$hasLogFile" -eq 1 ]]; then
-                echo "$(date +"%A %d %B %Y %T"): Пользователь $USER использовал некорректные символы '$email_func' при вводе значения имени пользователя." >> $USER_LOG_FILE
+                echo "$(date +"%A %d %B %Y %T"): Пользователь $USER использовал некорректные символы '$email_func' при вводе значения e-mail." >> $USER_LOG_FILE
             fi
         fi
     done
     if [[ "$hasLogFile" -eq 1 ]]; then
         echo "$(date +"%A %d %B %Y %T"): Закончили вводить e-mail." >> $USER_LOG_FILE
     fi
-    # echo ${email}
     return 0
 }
 
 function return_entered_phone() {
-    if [[ "$#" -eq 2 ]]; then
-        local hasLogFile=1
-        isFile $2
-        if [[ "$?" -eq 0 ]]; then
-            isWritableFile $2
-            if [[ ! "$?" -eq 0 ]]; then
-                chmod u+w $2
-            fi
-        else
-            touch $2
-            isWritableFile $2
-            if [[ ! "$?" -eq 0 ]]; then
-                chmod u+w $2
-            fi
+    if [[ $# -eq 2 ]]; then
+        if [[ ! -f "$2" ]]; then
+            printf "Ошибка: Некорректный лог-файл.\n"
+            return 23
         fi
-        echo "У функции два параметра: 1 - возвращаемая переменная (обязательная); 2 - 'имя лог-файла' (по требованию)."
+        if [[ ! -w "$2" ]]; then
+            printf "Ошибка: Лог-файл не записываемый.\n"
+            return 24
+        fi
+        local hasLogFile=1
         local USER_LOG_FILE=$2
         local -n phone_func=$1
-    elif [[ "$#" -eq 1 ]]; then
-        echo "У функции один параметр: 1 - возвращаемая переменная (обязательная). Т.к. второго пераметра нет - лог-файл не записывается."
-        local -n phone_func=$1
-        local hasLogFile=0
-    else
-        echo "Ошибка: У функции нет параметров. Всего два параметра: 1 - возвращаемая переменная (обязательная); 2 - 'имя лог-файла' (по требованию)."
-        return 1
-    fi
-    if [[ "$hasLogFile" -eq 1 ]]; then
         echo "$(date +"%A %d %B %Y %T"): Начинаем вводить телефон." >> $USER_LOG_FILE
+    elif [[ $# -eq 1 ]]; then
+        local hasLogFile=0
+        local -n phone_func=$1
+    else
+        printf "Ошибка: Некорректные параметры функции.\n"
+        printf "У функции может быть два параметра:\n"
+        printf "    1ый (обязательный) - 'имя переменной возвращаемого значения функции';\n"
+        printf "    2ой (не обязательный) - 'имя существующего лог-файла'.\n"
+        return 22
     fi
     while true; do
         read -p "Введите телефон в формате(+7-ххх-ххх-хх-хх): " phone_func
@@ -168,42 +147,35 @@ function return_entered_phone() {
     if [[ "$hasLogFile" -eq 1 ]]; then
         echo "$(date +"%A %d %B %Y %T"): Закончили вводить телефон." >> $USER_LOG_FILE
     fi
-    # echo ${phone}
     return 0
 }
 
 function return_entered_path() {
-    if [[ "$#" -eq 2 ]]; then
-        local hasLogFile=1
-        isFile $2
-        if [[ "$?" -eq 0 ]]; then
-            isWritableFile $2
-            if [[ ! "$?" -eq 0 ]]; then
-                chmod u+w $2
-            fi
-        else
-            touch $2
-            isWritableFile $2
-            if [[ ! "$?" -eq 0 ]]; then
-                chmod u+w $2
-            fi
+    if [[ $# -eq 2 ]]; then
+        if [[ ! -f "$2" ]]; then
+            printf "Ошибка: Некорректный лог-файл.\n"
+            return 23
         fi
-        echo "У функции два параметра: 1 - возвращаемая переменная (обязательная); 2 - 'имя лог-файла' (по требованию)."
+        if [[ ! -w "$2" ]]; then
+            printf "Ошибка: Лог-файл не записываемый.\n"
+            return 24
+        fi
+        local hasLogFile=1
         local USER_LOG_FILE=$2
         local -n answer_install_path=$1
-    elif [[ "$#" -eq 1 ]]; then
-        echo "У функции один параметр: 1 - возвращаемая переменная (обязательная). Т.к. второго пераметра нет - лог-файл не записывается."
-        local -n answer_install_path=$1
+        echo "$(date +"%A %d %B %Y %T"): Начинаем вводить имя каталога установки." >> $USER_LOG_FILE
+    elif [[ $# -eq 1 ]]; then
         local hasLogFile=0
+        local -n answer_install_path=$1
     else
-        echo "Ошибка: У функции нет параметров. Всего два параметра: 1 - возвращаемая переменная (обязательная); 2 - 'имя лог-файла' (по требованию)."
-        return 1
-    fi
-    if [[ "$hasLogFile" -eq 1 ]]; then
-        echo "$(date +"%A %d %B %Y %T"): Начинаем вводить папку установки программы." >> $USER_LOG_FILE
+        printf "Ошибка: Некорректные параметры функции.\n"
+        printf "У функции может быть два параметра:\n"
+        printf "    1ый (обязательный) - 'имя переменной возвращаемого значения функции';\n"
+        printf "    2ой (не обязательный) - 'имя существующего лог-файла'.\n"
+        return 22
     fi
     while true; do
-        read -p "Введите путь установки. Формат: '/home/user/some_folder_19/.program_folder': " answer_install_path
+        read -p "Введите путь каталога установки. Формат: '/home/user/some_folder_01/.setup_folder': " answer_install_path
         if [[ -z "$answer_install_path" ]]; then
             if [[ "$hasLogFile" -eq 1 ]]; then
                 echo "$(date +"%A %d %B %Y %T"): Ошибка: Пользователь $USER ввел пустое значение каталога установки." >> $USER_LOG_FILE
@@ -261,6 +233,5 @@ function return_entered_path() {
             fi
         fi
     done
-    # echo ${answer_install_path}
     return 0
 }
