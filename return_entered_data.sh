@@ -1,7 +1,7 @@
 #!/bin/bash
-source file_operation.sh
-
+source sign_file_folder.sh
 function return_entered_username() {
+    set -euo pipefail
     if [[ $# -eq 2 ]]; then
         if [[ ! -f "$2" ]]; then
             printf "Ошибка: Некорректный лог-файл.\n"
@@ -53,6 +53,7 @@ function return_entered_username() {
 }
 
 function return_entered_email() {
+    set -euo pipefail
     if [[ $# -eq 2 ]]; then
         if [[ ! -f "$2" ]]; then
             printf "Ошибка: Некорректный лог-файл.\n"
@@ -102,6 +103,7 @@ function return_entered_email() {
 }
 
 function return_entered_phone() {
+    set -euo pipefail
     if [[ $# -eq 2 ]]; then
         if [[ ! -f "$2" ]]; then
             printf "Ошибка: Некорректный лог-файл.\n"
@@ -151,6 +153,7 @@ function return_entered_phone() {
 }
 
 function return_entered_path() {
+    set -euo pipefail
     if [[ $# -eq 2 ]]; then
         if [[ ! -f "$2" ]]; then
             printf "Ошибка: Некорректный лог-файл.\n"
@@ -185,7 +188,9 @@ function return_entered_path() {
             if [[ "$hasLogFile" -eq 1 ]]; then
                 echo "$(date +"%A %d %B %Y %T"): Введен каталог установки: $answer_install_path" >> $USER_LOG_FILE
             fi
-            if [[ -d "$answer_install_path" ]]; then
+            isFolder return_is_folder $answer_install_path $USER_LOG_FILE
+            isFile return_is_file $answer_install_path $USER_LOG_FILE
+            if [[ "$return_is_folder" -eq 1 && "$return_is_file" -eq 0 ]]; then
                 if [[ "$hasLogFile" -eq 1 ]]; then
                     echo "$(date +"%A %d %B %Y %T"): Ошибка: Введеный каталог установки: '$answer_install_path' уже существует." >> $USER_LOG_FILE
                 fi
@@ -205,22 +210,17 @@ function return_entered_path() {
                             echo "$(date +"%A %d %B %Y %T"): Пользователь $USER отменил установку в существующий каталог." >> $USER_LOG_FILE
                         fi
                         break
-                    else
-                        echo "Некорректный символ."
-                        if [[ "$hasLogFile" -eq 1 ]]; then
-                            echo "$(date +"%A %d %B %Y %T"): Ошибка: Пользователь $USER не может ввести правильный символ y|Y или n|N в ответ на запрос." >> $USER_LOG_FILE
-                        fi
                     fi
                 done
                 if [[ "$get_out" -eq 1 ]]; then
                     break
                 fi
-            elif [[ -f "$answer_install_path" ]]; then
+            elif [[ "$return_is_folder" -eq 0 && "$return_is_file" -eq 1 ]]; then
                 echo "Ошибка: выбранная папка уже существует как файл. Введите новую папку установки."
                 if [[ "$hasLogFile" -eq 1 ]]; then
                     echo "$(date +"%A %d %B %Y %T"): Ошибка: введеный каталог установки: '$answer_install_path' является файлом." >> $USER_LOG_FILE
                 fi
-            else
+            elif [[ "$return_is_folder" -eq 0 && "$return_is_file" -eq 0 ]]; then
                 if [[ "$hasLogFile" -eq 1 ]]; then
                     echo "$(date +"%A %d %B %Y %T"): Все проверки прошли успешно. Введеный каталог установки '$answer_install_path' соответствует требованиям." >> $USER_LOG_FILE
                 fi

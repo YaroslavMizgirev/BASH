@@ -1,6 +1,8 @@
 #!/bin/bash
+source sign_file_folder.sh
 # информация о файле через команду stat
 function file_info() {
+    set -euo pipefail
     if [[ ! $# -eq 1 ]]; then
         # echo "Параметр должен быть один: имя файла."
         return 22
@@ -34,129 +36,8 @@ function file_info() {
     fi
 }
 
-# это файл? да-0/нет-1
-function isFile() {
-    if [[ $# -eq 2 ]]; then
-        if [[ ! -f "$2" ]]; then
-            printf "Ошибка: Некорректный лог-файл.\n"
-            return 23
-        fi
-        if [[ ! -w "$2" ]]; then
-            printf "Ошибка: Лог-файл не записываемый.\n"
-            return 24
-        fi
-        local hasLogFile=1
-        local USER_LOG_FILE=$2
-        echo "$(date +"%A %d %B %Y %T"): Начинаем проверку файла на соответствие '$1'." >> $USER_LOG_FILE
-    elif [[ $# -eq 1 ]]; then
-        local hasLogFile=0
-    else
-        printf "Ошибка: Некорректные параметры функции.\n"
-        printf "У функции может быть два параметра:\n"
-        printf "    1ый (обязательный) - 'проверяемый файл с абсолютным путем';\n"
-        printf "    2ой (не обязательный) - 'имя существующего лог-файла'.\n"
-        return 22
-    fi
-    if [[ -f "$1" ]]; then
-        if [[ "$hasLogFile" -eq 1 ]]; then
-            echo "$(date +"%A %d %B %Y %T"): Успешная проверка: '$1' - это файл." >> $USER_LOG_FILE
-        fi
-        printf "Успешная проверка: '%s' - это файл.\n" "$1"
-        return 0
-    else
-        if [[ "$hasLogFile" -eq 1 ]]; then
-            echo "$(date +"%A %d %B %Y %T"): Ошибка: '$1' - это не существующий файл." >> $USER_LOG_FILE
-        fi
-        printf "Ошибка: '%s' - это не существующий файл.\n" "$1"
-        return 1
-    fi
-}
-
-# этот файл доступен для записи? да-0/нет-1
-function isWritableFile() {
-    if [[ $# -eq 2 ]]; then
-        if [[ ! -f "$2" ]]; then
-            printf "Ошибка: Некорректный лог-файл.\n"
-            return 23
-        fi
-        if [[ ! -w "$2" ]]; then
-            printf "Ошибка: Лог-файл не записываемый.\n"
-            return 24
-        fi
-        local hasLogFile=1
-        local USER_LOG_FILE=$2
-        echo "$(date +"%A %d %B %Y %T"): Начинаем проверку на доступность записи в файл '$1'." >> $USER_LOG_FILE
-    elif [[ $# -eq 1 ]]; then
-        local hasLogFile=0
-    else
-        printf "Ошибка: Некорректные параметры функции.\n"
-        printf "У функции может быть два параметра:\n"
-        printf "    1ый (обязательный) - 'проверяемый файл с абсолютным путем';\n"
-        printf "    2ой (не обязательный) - 'имя существующего лог-файла'.\n"
-        return 22
-    fi
-    if [[ -f "$1" ]]; then
-        if [[ -w "$1" ]]; then
-            if [[ "$hasLogFile" -eq 1 ]]; then
-                echo "$(date +"%A %d %B %Y %T"): Успешная проверка: '$1' - это файл доступный для записи." >> $USER_LOG_FILE
-            fi
-            printf "Успешная проверка: '%s' - это файл доступный для записи.\n" "$1"
-            return 0
-        else
-            if [[ "$hasLogFile" -eq 1 ]]; then
-                echo "$(date +"%A %d %B %Y %T"): Ошибка: '$1' - это файл не доступный для записи." >> $USER_LOG_FILE
-            fi
-            printf "Ошибка: '%s' - это файл не доступный для записи.\n" "$1"
-            return 1
-        fi
-    else
-        if [[ "$hasLogFile" -eq 1 ]]; then
-            echo "$(date +"%A %d %B %Y %T"): Ошибка: '$1' - это не файл." >> $USER_LOG_FILE
-        fi
-        printf "Ошибка: '%s' - это не файл.\n" "$1"
-        return 1
-    fi
-}
-
-# это директория? да-0/нет-1
-function isFolder() {
-    if [[ $# -eq 2 ]]; then
-        if [[ ! -f "$2" ]]; then
-            printf "Ошибка: Некорректный лог-файл.\n"
-            return 23
-        fi
-        if [[ ! -w "$2" ]]; then
-            printf "Ошибка: Лог-файл не записываемый.\n"
-            return 24
-        fi
-        local hasLogFile=1
-        local USER_LOG_FILE=$2
-        echo "$(date +"%A %d %B %Y %T"): Начинаем проверку директории на соответствие '$1'." >> $USER_LOG_FILE
-    elif [[ $# -eq 1 ]]; then
-        local hasLogFile=0
-    else
-        printf "Ошибка: Некорректные параметры функции.\n"
-        printf "У функции может быть два параметра:\n"
-        printf "    1ый (обязательный) - 'проверяемая папка с абсолютным путем';\n"
-        printf "    2ой (не обязательный) - 'имя существующего лог-файла'.\n"
-        return 22
-    fi
-    if [[ -d "$1" ]]; then
-        if [[ "$hasLogFile" -eq 1 ]]; then
-            echo "$(date +"%A %d %B %Y %T"): Успешная проверка: '$1' - это директория." >> $USER_LOG_FILE
-        fi
-        printf "Успешная проверка: '%s' - это директория.\n" "$1"
-        return 0
-    else
-        if [[ "$hasLogFile" -eq 1 ]]; then
-            echo "$(date +"%A %d %B %Y %T"): Ошибка: '$1' - это не существующая директория." >> $USER_LOG_FILE
-        fi
-        printf "Ошибка: '%s' - это не существующая директория.\n" "$1"
-        return 1
-    fi
-}
-
 function count_all_files_in_folder() {
+    set -euo pipefail
     if [[ $# -eq 3 ]]; then
         if [[ ! -f "$3" ]]; then
             printf "Ошибка: Некорректный лог-файл.\n"
@@ -181,23 +62,27 @@ function count_all_files_in_folder() {
         printf "    3ий (не обязательный) - 'имя существующего лог-файла'.\n"
         return 22
     fi
+    local return_is_folder=0
     if [[ "$hasLogFile" -eq 1 ]]; then
-        isFolder $2 $USER_LOG_FILE
+        isFolder return_is_folder $2 $USER_LOG_FILE
     else
-        isFolder $2
-    fi
-    if [[ ! "$?" -eq 0 ]]; then
-        return 1
+        isFolder return_is_folder $2
     fi
     file_count_func=0
+    if [[ ! "$return_is_folder" -eq 0 ]]; then
+        echo "$(date +"%A %d %B %Y %T"): Успешное выполнение: Найдено '$file_count_func' файлов в директории." >> $USER_LOG_FILE
+        echo "$(date +"%A %d %B %Y %T"): Подсчет файлов в директории '$2' закончен." >> $USER_LOG_FILE
+        return 1
+    fi
+    local return_is_file=0
     for file_handler in $2; do
         if [[ "$hasLogFile" -eq 1 ]]; then
-            isFile $file_handler $USER_LOG_FILE
+            isFile return_is_file $file_handler $USER_LOG_FILE
         else
-            isFile $file_handler
+            isFile return_is_file $file_handler
         fi
-        if [[ "$?" -eq 0 ]]; then
-            let "file_count_func++"
+        if [[ "$return_is_file" -eq 0 ]]; then
+            let "file_count_func+=1"
         fi
     done
     if [[ "$hasLogFile" -eq 1 ]]; then
@@ -209,6 +94,7 @@ function count_all_files_in_folder() {
 }
 
 function count_lic_files_in_folder() {
+    set -euo pipefail
     if [[ $# -eq 3 ]]; then
         if [[ ! -f "$3" ]]; then
             printf "Ошибка: Некорректный лог-файл.\n"
@@ -220,10 +106,12 @@ function count_lic_files_in_folder() {
         fi
         local hasLogFile=1
         local USER_LOG_FILE=$3
+        local cert_folder=$2
         local -n file_count_func=$1
         echo "$(date +"%A %d %B %Y %T"): Начинаем подсчет файлов-сертификатов в директории '$2'." >> $USER_LOG_FILE
     elif [[ $# -eq 2 ]]; then
         local hasLogFile=0
+        local cert_folder=$2
         local -n file_count_func=$1
     else
         printf "Ошибка: Некорректные параметры функции.\n"
@@ -233,23 +121,19 @@ function count_lic_files_in_folder() {
         printf "    3ий (не обязательный) - 'имя существующего лог-файла'.\n"
         return 22
     fi
-    if [[ "$hasLogFile" -eq 1 ]]; then
-        isFolder $2 $USER_LOG_FILE
-    else
-        isFolder $2
-    fi
-    if [[ ! "$?" -eq 0 ]]; then
-        return 1
-    fi
+    local return_is_folder=0
+    isFolder return_is_folder $cert_folder
     file_count_func=0
-    for file_handler in $2; do
-        if [[ "$hasLogFile" -eq 1 ]]; then
-            isFile $file_handler $USER_LOG_FILE
-        else
-            isFile $file_handler
-        fi
-        if [[ "$?" -eq 0 && "$file_handler" =~ ^certificate[0-9]*\.lic$ ]]; then
-            let "file_count_func++"
+    if [[ "$return_is_folder" -eq 0 ]]; then
+        echo "$(date +"%A %d %B %Y %T"): Успешное выполнение: Найдено '$file_count_func' файлов-сертификатов в директории." >> $USER_LOG_FILE
+        echo "$(date +"%A %d %B %Y %T"): Подсчет файлов-сертификатов в директории '$2' закончен." >> $USER_LOG_FILE
+        return 0
+    fi
+    local return_is_file=0
+    for file_handler in $cert_folder/*; do
+        isFile return_is_file $file_handler
+        if [[ "$return_is_file" -eq 1 && $(basename "$file_handler") =~ ^certificate[0-9]*.lic$ ]]; then
+            let "file_count_func += 1"
         fi
     done
     if [[ "$hasLogFile" -eq 1 ]]; then
